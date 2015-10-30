@@ -9,18 +9,66 @@ import android.view.SurfaceView;
 /**
  * Created by Single on 2015/10/26.
  */
-public class SurfaceViewTemplate extends SurfaceView {
+public class SurfaceViewTemplate extends SurfaceView implements SurfaceHolder.Callback, Runnable {
 
-    private SurfaceHolder surfaceHolder;
-    private Canvas canvas;
+    private SurfaceHolder mHolder;
+    private Canvas mCanvas;
 
     private Thread thread;
+    private boolean isRunning;
 
     public SurfaceViewTemplate(Context context) {
-        super(context , null);
+        super(context, null);
     }
 
     public SurfaceViewTemplate(Context context, AttributeSet attrs) {
         super(context, attrs);
+        mHolder = getHolder();
+        mHolder.addCallback(this);
+
+        //获得焦点
+        setFocusable(true);
+        setFocusableInTouchMode(true);
+        //设置常量
+        setKeepScreenOn(true);
+    }
+
+    @Override
+    public void surfaceCreated(SurfaceHolder surfaceHolder) {
+        isRunning = true;
+        thread = new Thread(this);
+        thread.start();
+    }
+
+    @Override
+    public void surfaceChanged(SurfaceHolder surfaceHolder, int i, int i1, int i2) {
+
+    }
+
+    @Override
+    public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
+        isRunning = false;
+    }
+
+    @Override
+    public void run() {
+        while (isRunning) {
+            draw();
+        }
+    }
+
+    private void draw() {
+        try {
+            mCanvas = mHolder.lockCanvas();
+            if (mCanvas != null) {
+
+            }
+        } catch (Exception e) {
+
+        } finally {
+            if (mCanvas != null) {
+                mHolder.unlockCanvasAndPost(mCanvas);
+            }
+        }
     }
 }
