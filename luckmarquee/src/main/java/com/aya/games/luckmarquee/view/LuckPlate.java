@@ -29,11 +29,11 @@ public class LuckPlate extends SurfaceView implements SurfaceHolder.Callback, Ru
     private String[] mStrs = new String[]{"林黛玉", "贾迎春", "史湘云", "妙玉", "贾元春", "王熙凤"};
     private int[] mImgs = new int[]{R.mipmap.img_lindaiyu, R.mipmap.img_jiayingchun,
             R.mipmap.img_shixiangyun, R.mipmap.img_miaoyu, R.mipmap.img_jiayuanchun, R.mipmap.img_qinkeqin};
-    private int[] mColor = new int[]{R.color.shanby01, R.color.shanby02, R.color.shanby01, R.color.shanby02, R.color.shanby01, R.color.shanby02,};
+    private int[] mColor = new int[]{0xFFFFC300, 0xFFF17E01, 0xFFFFC300, 0xFFF17E01, 0xFFFFC300, 0xFFF17E01};
 
     private int mItemCount = 6;
     //与图片对应的数组
-    private Bitmap[] mImagsBitmap;
+    private Bitmap[] mImagesBitmap;
     private Bitmap mBgBitmap = BitmapFactory.decodeResource(getResources(), R.mipmap.bg2);
 
     //整个盘快的范围
@@ -93,14 +93,14 @@ public class LuckPlate extends SurfaceView implements SurfaceHolder.Callback, Ru
         mArcPaint.setDither(true);
 
         mTextPaint = new Paint();
-        mTextPaint.setColor(0xffffff);
+        mTextPaint.setColor(0xffffffff);
         mTextPaint.setTextSize(mTextSize);
 
         mRange = new RectF(mPadding, mPadding, mPadding + mRadius, mPadding + mRadius);
 
-        mImagsBitmap = new Bitmap[mItemCount];
+        mImagesBitmap = new Bitmap[mItemCount];
         for (int i = 0; i < mItemCount; i++) {
-            mImagsBitmap[i] = BitmapFactory.decodeResource(getResources(), mImgs[i]);
+            mImagesBitmap[i] = BitmapFactory.decodeResource(getResources(), mImgs[i]);
         }
 
         isRunning = true;
@@ -110,7 +110,6 @@ public class LuckPlate extends SurfaceView implements SurfaceHolder.Callback, Ru
 
     @Override
     public void surfaceChanged(SurfaceHolder surfaceHolder, int i, int i1, int i2) {
-
     }
 
     @Override
@@ -126,12 +125,29 @@ public class LuckPlate extends SurfaceView implements SurfaceHolder.Callback, Ru
             long endTime = System.currentTimeMillis();
             if (endTime - startTime < 50) {
                 try {
-                    Thread.sleep(endTime - startTime);
+                    Thread.sleep(50 - (endTime - startTime));
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
         }
+    }
+
+    public void luckStart() {
+        mSpeed = 30;
+        isShouldEnd = false;
+    }
+
+    public void luckEnd() {
+        isShouldEnd = true;
+    }
+
+    public boolean isStartLuck() {
+        return mSpeed != 0;
+    }
+
+    public boolean isShouldEnd() {
+        return isShouldEnd;
     }
 
     private void draw() {
@@ -148,8 +164,17 @@ public class LuckPlate extends SurfaceView implements SurfaceHolder.Callback, Ru
                     mCanvas.drawArc(mRange, tmpAngle, sweepAngle, true, mArcPaint);
                     //绘制文本
                     drawText(tmpAngle, sweepAngle, mStrs[i]);
-                    drawIcon(tmpAngle, mImagsBitmap[i]);
+                    drawIcon(tmpAngle, mImagesBitmap[i]);
                     tmpAngle += sweepAngle;
+                }
+                mStartAngle += mSpeed;
+                //如果点击了停止按钮
+                if (isShouldEnd) {
+                    mSpeed -= 1;
+                }
+                if (mSpeed <= 0) {
+                    mSpeed = 0;
+                    isShouldEnd = false;
                 }
             }
         } catch (Exception e) {
@@ -169,7 +194,7 @@ public class LuckPlate extends SurfaceView implements SurfaceHolder.Callback, Ru
         int y = (int) (mCenter + mRadius / 2 / 2 * Math.sin(angle));
 
         //确定图片位置
-        Rect rect = new Rect(x - imgWidth/2, y - imgWidth / 2, x + imgWidth / 2, y + imgWidth / 2);
+        Rect rect = new Rect(x - imgWidth / 2, y - imgWidth / 2, x + imgWidth / 2, y + imgWidth / 2);
         mCanvas.drawBitmap(bitmap, null, rect, null);
     }
 
@@ -183,8 +208,7 @@ public class LuckPlate extends SurfaceView implements SurfaceHolder.Callback, Ru
     }
 
     private void drawBg() {
-        mCanvas.drawColor(0xffffff);
+        mCanvas.drawColor(0xffffffff);
         mCanvas.drawBitmap(mBgBitmap, null, new Rect(mPadding / 2, mPadding / 2, getMeasuredWidth() - mPadding / 2, getMeasuredHeight() - mPadding / 2), null);
-
     }
 }
