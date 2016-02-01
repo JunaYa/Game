@@ -119,7 +119,7 @@ public class LuckPlate extends SurfaceView implements SurfaceHolder.Callback, Ru
 
     @Override
     public void run() {
-        while (isRunning) {
+        while (isRunning) { 
             long startTime = System.currentTimeMillis();
             draw();
             long endTime = System.currentTimeMillis();
